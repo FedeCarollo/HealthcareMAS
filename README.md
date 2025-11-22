@@ -1,95 +1,116 @@
 # HealthcareMAS 🏥
 **Multi-Agent System for Healthcare Assistance**
 
-Un sistema multi-agente avanzato progettato per assistere professionisti sanitari nella gestione integrata del paziente attraverso AI specializzata in diversi ambiti medici.
+An advanced multi-agent system designed to assist healthcare professionals in integrated patient management through specialized AI agents across different medical domains.
 
-## 🎯 Panoramica del Progetto
+## 🎯 Project Overview
 
-HealthcareMAS è un sistema innovativo che utilizza agenti AI specializzati per supportare il processo decisionale medico in un ambiente "Human-in-the-Loop". Il sistema coordina tre agenti principali:
+HealthcareMAS is an innovative system that uses specialized AI agents to support medical decision-making in a "Human-in-the-Loop" environment. The system coordinates three main agents:
 
-- 🩺 **MedAI** - Medico di base per analisi cliniche e piani terapeutici
-- 🥗 **NutriAI** - Nutrizionista per piani alimentari personalizzati 
-- 🧠 **PsyAI** - Psicologo per monitoraggio del benessere psicofisico
+- 🩺 **MedAI** - Primary care physician for clinical analysis and therapeutic plans
+- 🥗 **NutriAI** - Nutritionist for personalized meal planning
+- 🧠 **PsyAI** - Psychologist for psychophysical wellness monitoring
 
-## ⚕️ Architettura del Sistema
+## ⚕️ System Architecture
 
-### Pipeline di Workflow Clinico
+### Clinical Workflow Pipeline
 ```
-Paziente → MedAI → NutriAI → PsyAI → Validazione Medico → Paziente
+Patient → MedAI → NutriAI → PsyAI → Medical Validation → Patient
 ```
 
-1. **Analisi Clinica**: MedAI analizza il report medico e genera un piano terapeutico
-2. **Piano Nutrizionale**: NutriAI crea un piano alimentare sincronizzato con le terapie
-3. **Monitoraggio Psicologico**: PsyAI valuta lo stato psicofisico e l'aderenza terapeutica
-4. **Supervisione Medica**: Un medico qualificato valida tutte le raccomandazioni
+1. **Clinical Analysis**: MedAI analyzes medical reports and generates therapeutic plans
+2. **Nutritional Planning**: NutriAI creates meal plans synchronized with therapies
+3. **Psychological Monitoring**: PsyAI evaluates psychophysical state and therapy adherence
+4. **Medical Supervision**: A qualified physician validates all recommendations
 
-### 🤖 Agenti Specializzati
+### 🤖 Specialized Agents
 
-#### MedAI - Medico di Base
-- **Specializzazione**: Medicina interna e farmacologia clinica
-- **Input**: Report clinici, risultati laboratorio, anamnesi
-- **Output**: Piano terapeutico strutturato in JSON
-- **Sicurezza**: Analisi drug interactions, flag di attenzione per il medico
+#### MedAI - Primary Care Physician
+- **Specialization**: Internal medicine and clinical pharmacology
+- **Input**: Clinical reports, laboratory results, patient history
+- **Output**: Structured therapeutic plan in JSON format
+- **Safety**: Drug interaction analysis, attention flags for physicians
 
-#### NutriAI - Nutrizionista Clinico  
-- **Specializzazione**: Piani alimentari personalizzati e sincronizzazione farmacologica
-- **Input**: Piano terapeutico da MedAI
-- **Output**: Piano settimanale completo (7 giorni) con timing farmaci
-- **Features**: Drug-nutrient interactions, liste della spesa, macro bilanciamento
+#### NutriAI - Clinical Nutritionist  
+- **Specialization**: Personalized meal planning and pharmacological synchronization
+- **Input**: Therapeutic plan from MedAI
+- **Output**: Complete 7-day plan with medication timing
+- **Features**: Drug-nutrient interactions, shopping lists, macro balancing
 
-#### PsyAI - Psicologo Clinico
-- **Specializzazione**: Analisi correlazione biometrica-psicologica
-- **Input**: Feedback soggettivo + dati wearable (Apple Watch, Fitbit)
-- **Output**: Assessment dello stato mentale con alerting medico
-- **Monitoraggio**: HRV, qualità sonno, stress fisiologico
+#### PsyAI - Clinical Psychologist
+- **Specialization**: Biometric-psychological correlation analysis
+- **Input**: Subjective feedback + wearable data (Apple Watch, Fitbit)
+- **Output**: Mental state assessment with medical alerting
+- **Monitoring**: HRV, sleep quality, physiological stress
 
-## 🛠️ Setup Tecnico
+## 🛠️ Technical Setup
 
-### Prerequisiti
+### Prerequisites
 ```bash
 Python 3.8+
 OpenAI API Key
 datapizza-ai framework
 ```
 
-### Installazione
+### Installation
 ```bash
 git clone https://github.com/FedeCarollo/HealthcareMAS
 cd HealthcareMAS
 pip install datapizza-ai
 ```
 
-### Configurazione
-1. Crea file `.env`:
+### Configuration
+1. Create `.env` file:
 ```bash
 OPEN_AI_KEY=your_openai_api_key_here
 ```
 
-2. Importa il sistema di configurazione:
+2. Import configuration system:
 ```python
 from config import get_openai_key
 ```
 
-## 🚀 Utilizzo
+## 🚀 Usage
 
-### Esempio Base - Workflow Completo
+### Basic Example - Complete Workflow
+```python
+# Unified Pipeline Function (Recommended)
+from healthcare_mas_pipeline import healthcare_mas_pipeline
+from agents.medico_base import clinical_summary
+from agents.psicologo import daily_payload
+
+# Complete execution with automatic file saving
+result = healthcare_mas_pipeline(
+    clinical_summary=clinical_summary,
+    daily_data=daily_payload,
+    doctor_report=None,  # Optional medical updates
+    save_folder="medical_reports"  # Custom folder name
+)
+
+# Access results
+medical_plan = result['medical_plan']
+nutrition_plan = result['nutrition_plan']
+psych_assessment = result['psychological_assessment']
+```
+
+### Manual Step-by-Step Workflow
 ```python
 from agents.medico_base import get_medico, clinical_summary
 from agents.nutrizionista import get_nutrizionista  
 from agents.psicologo import get_psyai, daily_payload
 import json
 
-# 1. Analisi Medica
+# 1. Medical Analysis
 medico = get_medico()
 response = medico.run(clinical_summary)
 piano_terapeutico = json.loads(response.text)
 
-# 2. Piano Nutrizionale
+# 2. Nutritional Planning
 nutrizionista = get_nutrizionista()
 response = nutrizionista.run(json.dumps(piano_terapeutico))
 piano_settimanale = json.loads(response.text)
 
-# 3. Monitoraggio Psicologico
+# 3. Psychological Monitoring
 psicologo = get_psyai()
 input_psicologo = {
     "clinical_summary": clinical_summary,
@@ -100,115 +121,159 @@ input_psicologo = {
 assessment = psicologo.run(json.dumps(input_psicologo))
 ```
 
-### Esempio Jupyter Notebook
-Il progetto include un notebook interattivo (`notebook.ipynb`) che dimostra l'intero workflow clinico con dati di esempio.
+### Interactive Jupyter Notebook
+The project includes an interactive notebook (`notebook.ipynb`) demonstrating the complete clinical workflow with example data.
 
-## 📊 Formato Dati
+## 📊 Data Format
 
-### Input Clinico (MedAI)
+### Clinical Input (MedAI)
 ```
-- Anamnesi del paziente
-- Parametri vitali (PA, FC, SpO2)
-- Risultati laboratorio (HbA1c, colesterolo, ecc.)
-- Sintomi e diagnosi preliminari
+- Patient history
+- Vital signs (BP, HR, SpO2)
+- Laboratory results (HbA1c, cholesterol, etc.)
+- Symptoms and preliminary diagnosis
 ```
 
-### Output Terapeutico (MedAI)
+### Therapeutic Output (MedAI)
 ```json
 {
-  "diagnostic_summary": "Riassunto clinico",
+  "diagnostic_summary": "Clinical summary",
   "treatment_plan": [
     {
-      "medication": "Principio attivo",
+      "medication": "Active ingredient",
       "dosage": "500mg", 
-      "frequency": "1 compressa ogni 12 ore",
-      "administration_instructions": "Dopo i pasti",
-      "duration": "7 giorni",
-      "purpose": "Finalità clinica"
+      "frequency": "1 tablet every 12 hours",
+      "administration_instructions": "After meals",
+      "duration": "7 days",
+      "purpose": "Clinical purpose"
     }
   ],
-  "medical_recommendations": ["Consigli non farmacologici"],
-  "attention_flag": "Alert per il medico"
+  "medical_recommendations": ["Non-pharmacological suggestions"],
+  "attention_flag": "Medical alerts or 'None'"
 }
 ```
 
-## ⚠️ Compliance e Sicurezza
+## 📁 Automatic File Management
 
-### Disclaimer Medico
-- ❌ **NON sostituisce** la consulenza medica professionale
-- ❌ **NON fornisce** diagnosi definitive 
-- ❌ **NON prescrive** farmaci autonomamente
-- ✅ **Supporta** il processo decisionale del medico
-- ✅ **Richiede** sempre validazione da parte di professionista qualificato
+### Generated Reports
+The `healthcare_mas_pipeline()` function automatically generates:
 
-### Privacy e HIPAA
-- Tutti i dati del paziente sono processati localmente
-- Nessuna informazione sensibile viene memorizzata permanentemente
-- Compliance con standard di privacy sanitari
+- **📄 `medical_plan_{timestamp}.json`** - Complete therapeutic plan
+- **🥗 `nutrition_plan_{timestamp}.json`** - Weekly meal plan
+- **🧠 `psychological_assessment_{timestamp}.json`** - Psychological assessment
+- **📋 `complete_summary_{timestamp}.json`** - Complete summary
+- **📖 `human_readable_report_{timestamp}.txt`** - Human-readable report
+- **🛒 `shopping_list_{timestamp}.txt`** - Shopping list (if available)
 
-## 🔧 Personalizzazione Agenti
+### File Structure Example
+```
+medical_reports_20251122_143052/
+├── medical_plan_20251122_143052.json
+├── nutrition_plan_20251122_143052.json
+├── psychological_assessment_20251122_143052.json
+├── complete_summary_20251122_143052.json
+├── human_readable_report_20251122_143052.txt
+└── shopping_list_20251122_143052.txt
+```
 
-### Aggiungere Nuovi Tool
+## ⚠️ Compliance and Safety
+
+### Medical Disclaimer
+- ❌ **DOES NOT replace** professional medical consultation
+- ❌ **DOES NOT provide** definitive diagnoses
+- ❌ **DOES NOT prescribe** medications autonomously
+- ✅ **SUPPORTS** physician decision-making
+- ✅ **REQUIRES** validation by qualified professionals
+
+### Privacy and HIPAA
+- All patient data is processed locally
+- No sensitive information is permanently stored
+- Compliant with healthcare privacy standards
+
+## 🔧 Agent Customization
+
+### Adding New Tools
 ```python
 from datapizza.tools import tool
 
 @tool
 def check_drug_interactions(med1: str, med2: str) -> str:
-    """Verifica interazioni farmacologiche"""
-    # Logic per controllo interazioni
-    return f"Controllo {med1} vs {med2} completato"
+    """Check drug interactions"""
+    # Interaction checking logic
+    return f"Interaction check {med1} vs {med2} completed"
 
-# Aggiungi all'agente
+# Add to agent
 agent = Agent(client=client, tools=[check_drug_interactions])
 ```
 
-### Modificare Prompt Sistema
-Ogni agente ha un `system_prompt` personalizzabile nel file corrispondente in `/agents/`.
+### Modifying System Prompts
+Each agent has a customizable `system_prompt` in the corresponding file in `/agents/`.
 
-## 📁 Struttura del Progetto
+## 📁 Project Structure
 ```
 HealthcareMAS/
 ├── agents/
-│   ├── client.py          # Client OpenAI condiviso
-│   ├── medico_base.py     # Agente MedAI
-│   ├── nutrizionista.py   # Agente NutriAI  
-│   └── psicologo.py       # Agente PsyAI
-├── config.py              # Gestione configurazioni
-├── main.py                # Script principale
-├── notebook.ipynb        # Demo interattiva
-├── test.py                # Test sistema
+│   ├── client.py          # Shared OpenAI client
+│   ├── medico_base.py     # MedAI agent
+│   ├── nutrizionista.py   # NutriAI agent  
+│   └── psicologo.py       # PsyAI agent
+├── .github/
+│   └── copilot-instructions.md  # AI coding guidelines
+├── config.py              # Configuration management
+├── main.py                # Main script
+├── notebook.ipynb        # Interactive demo
+├── test.py                # System tests
 └── README.md
 ```
 
-## 📈 Casi d'Uso
+## 📈 Use Cases
 
-### Scenario Tipico: Paziente con Sindrome Metabolica
-1. **Input**: Report con diabete T2, ipertensione, GERD
-2. **MedAI**: Prescrive Metformina, ACE-inibitore, PPI
-3. **NutriAI**: Dieta mediterranea a basso sodio, timing farmaci sincronizzati
-4. **PsyAI**: Monitora stress da cambio lifestyle, aderenza terapeutica
+### Typical Scenario: Patient with Metabolic Syndrome
+1. **Input**: Report with T2 diabetes, hypertension, GERD
+2. **MedAI**: Prescribes Metformin, ACE inhibitor, PPI
+3. **NutriAI**: Mediterranean low-sodium diet, synchronized medication timing
+4. **PsyAI**: Monitors lifestyle change stress, therapy adherence
 
-### Integrazione Wearable
-PsyAI analizza dati da dispositivi come Apple Watch:
+### Wearable Integration
+PsyAI analyzes data from devices like Apple Watch:
 - Heart Rate Variability (HRV) 
-- Qualità del sonno
-- Livelli di attività
-- Correlazione con stato emotivo self-reported
+- Sleep quality
+- Activity levels
+- Correlation with self-reported emotional state
 
-## 🤝 Contributi
+### Doctor Report Updates
+The system supports iterative medical updates:
+```python
+# Example with doctor feedback
+doctor_update = """
+MEDICAL UPDATE - Dr. Smith Review (2025-11-22):
+1. Increase Metformin to 1000mg twice daily
+2. Add Atorvastatin 20mg daily
+3. Monitor for lactic acidosis
+"""
 
-Il progetto è open-source sotto licenza Apache 2.0. Contributi benvenuti per:
-- Nuovi agenti specialistici 
-- Integrazioni con API mediche
-- Miglioramenti algoritmi di correlazione
-- Test clinici e validazioni
+result = healthcare_mas_pipeline(
+    clinical_summary=clinical_summary,
+    daily_data=daily_payload,
+    doctor_report=doctor_update,  # Medical update
+    save_folder="updated_reports"
+)
+```
 
-## 📞 Supporto
+## 🤝 Contributions
 
-Per supporto tecnico o questioni mediche:
-- 🚨 **Emergenze**: Contatta sempre il 118
-- 🏥 **Questioni Cliniche**: Consulta il tuo medico di fiducia
-- 💻 **Supporto Tecnico**: Apri una issue su GitHub
+The project is open-source under Apache 2.0 license. Contributions welcome for:
+- New specialized agents 
+- Medical API integrations
+- Correlation algorithm improvements
+- Clinical testing and validations
+
+## 📞 Support
+
+For technical support or medical questions:
+- 🚨 **Emergencies**: Always contact 911/emergency services
+- 🏥 **Clinical Questions**: Consult your healthcare provider
+- 💻 **Technical Support**: Open a GitHub issue
 
 ---
-**⚕️ Ricorda: Questo sistema supporta ma non sostituisce mai il giudizio clinico professionale**
+**⚕️ Remember: This system supports but never replaces professional clinical judgment**
