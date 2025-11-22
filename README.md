@@ -49,14 +49,42 @@ Patient → MedAI → NutriAI → PsyAI → Medical Validation → Patient
 ```bash
 Python 3.8+
 OpenAI API Key
-datapizza-ai framework
+datapizza-ai framework (Core dependency)
 ```
 
 ### Installation
 ```bash
 git clone https://github.com/FedeCarollo/HealthcareMAS
 cd HealthcareMAS
+
+# Install all dependencies from requirements.txt
+pip install -r requirements.txt
+
+# Or install manually
 pip install datapizza-ai
+```
+
+### Datapizza-AI Framework Integration
+HealthcareMAS is built on the **datapizza-ai** framework, a powerful tool for creating specialized AI agents:
+
+- **🤖 Agent Creation**: Simple agent instantiation with custom prompts
+- **🔧 Tool Integration**: Easy addition of custom medical tools
+- **🔗 Client Management**: Unified OpenAI API client handling
+- **📊 Response Processing**: Structured JSON output parsing
+
+```python
+from datapizza.agents import Agent
+from datapizza.clients.openai import OpenAIClient
+from datapizza.tools import tool
+
+# Example: Creating a medical agent with datapizza
+client = OpenAIClient(api_key=your_api_key)
+agent = Agent(
+    client=client,
+    name="MedicalAssistant",
+    system_prompt="Your specialized medical prompt...",
+    tools=[your_custom_tools]
+)
 ```
 
 ### Configuration
@@ -192,38 +220,94 @@ medical_reports_20251122_143052/
 
 ## 🔧 Agent Customization
 
-### Adding New Tools
+### Adding New Tools with Datapizza Framework
+The datapizza-ai framework makes tool integration seamless:
+
 ```python
 from datapizza.tools import tool
+from datapizza.agents import Agent
 
 @tool
 def check_drug_interactions(med1: str, med2: str) -> str:
-    """Check drug interactions"""
-    # Interaction checking logic
-    return f"Interaction check {med1} vs {med2} completed"
+    """Check drug interactions using medical databases"""
+    # Advanced interaction checking logic
+    return f"Interaction analysis: {med1} vs {med2} - Status: Safe/Warning/Contraindicated"
 
-# Add to agent
-agent = Agent(client=client, tools=[check_drug_interactions])
+@tool
+def calculate_drug_dosage(weight: float, age: int, medication: str) -> str:
+    """Calculate appropriate drug dosage based on patient parameters"""
+    # Dosage calculation algorithm
+    return f"Recommended dosage for {medication}: calculated based on {weight}kg, {age}y"
+
+# Create enhanced medical agent
+enhanced_agent = Agent(
+    client=client,
+    name="EnhancedMedAI", 
+    system_prompt="Advanced medical AI with drug interaction analysis...",
+    tools=[check_drug_interactions, calculate_drug_dosage]
+)
 ```
 
 ### Modifying System Prompts
-Each agent has a customizable `system_prompt` in the corresponding file in `/agents/`.
+Each agent has a customizable `system_prompt` leveraging datapizza's prompt engineering:
 
 ## 📁 Project Structure
 ```
 HealthcareMAS/
 ├── agents/
-│   ├── client.py          # Shared OpenAI client
-│   ├── medico_base.py     # MedAI agent
-│   ├── nutrizionista.py   # NutriAI agent  
-│   └── psicologo.py       # PsyAI agent
+│   ├── client.py          # Shared OpenAI client (datapizza integration)
+│   ├── medico_base.py     # MedAI agent (datapizza Agent)
+│   ├── nutrizionista.py   # NutriAI agent (datapizza Agent)
+│   └── psicologo.py       # PsyAI agent (datapizza Agent)
 ├── .github/
 │   └── copilot-instructions.md  # AI coding guidelines
 ├── config.py              # Configuration management
 ├── main.py                # Main script
 ├── notebook.ipynb        # Interactive demo
 ├── test.py                # System tests
+├── requirements.txt       # Project dependencies
 └── README.md
+```
+
+## 🔧 Datapizza-AI Framework Features
+
+### Core Agent Architecture
+Each healthcare agent leverages datapizza-ai's robust architecture:
+
+```python
+# Agent creation with datapizza framework
+from datapizza.agents import Agent
+from datapizza.clients.openai import OpenAIClient
+
+agent = Agent(
+    client=OpenAIClient(api_key=api_key),
+    name="HealthcareAgent",
+    system_prompt="Specialized medical prompt",
+    tools=[medical_tools]  # Custom healthcare tools
+)
+
+# Structured agent execution
+response = agent.run(clinical_input)
+structured_output = json.loads(response.text)
+```
+
+### Medical Tool Integration
+Datapizza's `@tool` decorator enables seamless medical tool integration:
+
+```python
+from datapizza.tools import tool
+
+@tool
+def analyze_vital_signs(bp: str, hr: int, temp: float) -> str:
+    """Analyze patient vital signs using medical protocols"""
+    # Medical analysis logic
+    return clinical_assessment
+
+@tool
+def check_drug_interactions(med1: str, med2: str) -> str:
+    """Check potential drug interactions"""
+    # Drug interaction database lookup
+    return interaction_report
 ```
 
 ## 📈 Use Cases
